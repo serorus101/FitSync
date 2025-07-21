@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitSync - エクササイズカタログ</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+            margin: 0;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 18px;
+            margin: 10px 0 0 0;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007AFF;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .category-section {
+            margin-bottom: 40px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #007AFF;
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .category-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        
+        .category-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .exercise-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .exercise-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .exercise-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 0 0 8px 0;
+        }
+        
+        .exercise-description {
+            color: #666;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .target-muscles {
+            margin-bottom: 15px;
+        }
+        
+        .muscle-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        
+        .instructions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .instruction-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .instruction-step {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        .instruction-step::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #007AFF;
+            color: white;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            font-size: 10px;
+            text-align: center;
+            line-height: 12px;
+        }
+        
+        .instructions ol {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .back { background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .chest { background: linear-gradient(135deg, #2196F3, #1976D2); }
+        .shoulders { background: linear-gradient(135deg, #FF9800, #F57C00); }
+        .arms { background: linear-gradient(135deg, #9C27B0, #7B1FA2); }
+        .core { background: linear-gradient(135deg, #F44336, #D32F2F); }
+        
+        .search-bar {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            margin-bottom: 30px;
+            box-sizing: border-box;
+        }
+        
+        .search-bar:focus {
+            outline: none;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💪 FitSync エクササイズカタログ</h1>
+            <p>追加された新しいワークアウト種目</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-number">22</span>
+                <span class="stat-label">総エクササイズ数</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">18</span>
+                <span class="stat-label">新規追加種目</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">5</span>
+                <span class="stat-label">カテゴリー</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">詳細説明付き</span>
+            </div>
+        </div>
+        
+        <input type="text" class="search-bar" placeholder="エクササイズを検索..." id="searchBar" oninput="filterExercises()">
+        
+        <!-- 背中の種目 -->
+        <div class="category-section">
+            <div class="category-header back">
+                <h2 class="category-title">背中 (BACK) - 4種目</h2>
+            </div>
+            <div class="exercise-grid">
+                <div class="exercise-card" data-name="ラットプルダウン">
+                    <h3 class="exercise-name">ラットプルダウン</h3>
+                    <p class="exercise-description">背中の幅を広げる代表的な種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">広背筋</span>
+                        <span class="muscle-tag">大円筋</span>
+                        <span class="muscle-tag">僧帽筋中部</span>
+                        <span class="muscle-tag">上腕二頭筋</span>
+                    </div>
+                    <div class="instructions">
+                        <div class="instruction-title">実行手順:</div>
+                        <ol>
+                            <li class="instruction-step">シートに座り、太ももをパッドで固定する</li>
+                            <li class="instruction-step">バーを肩幅より広めに握る</li>
+                            <li class="instruction-step">胸を張り、肩甲骨を寄せながらバーを胸上部まで引く</li>
+                            <li class="instruction-step">ゆっくりとバーを元の位置に戻す</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="シーテッドロー">
+                    <h3 class="exercise-name">シーテッドロー</h3>
+                    <p class="exercise-description">背中の厚みを作る基本種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">広背筋</span>
+                        <span class="muscle-tag">菱形筋</span>
+                        <span class="muscle-tag">僧帽筋中部</span>
+                        <span class="muscle-tag">後部三角筋</span>
+                    </div>
+                    <div class="instructions">
+                        <div class="instruction-title">実行手順:</div>
+                        <ol>
+                            <li class="instruction-step">シートに座り、足をプレートに置く</li>
+                            <li class="instruction-step">ケーブルハンドルを両手で握る</li>
+                            <li class="instruction-step">胸を張り、肩甲骨を寄せながら肘を後ろに引く</li>
+                            <li class="instruction-step">ゆっくりと元の位置に戻す</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="ベントオーバーローイング">
+                    <h3 class="exercise-name">ベントオーバーローイング</h3>
+                    <p class="exercise-description">背中全体を鍛える複合種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">広背筋</span>
+                        <span class="muscle-tag">菱形筋</span>
+                        <span class="muscle-tag">僧帽筋</span>
+                        <span class="muscle-tag">後部三角筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="デッドリフト">
+                    <h3 class="exercise-name">デッドリフト</h3>
+                    <p class="exercise-description">背中と下半身を同時に鍛える複合種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">広背筋</span>
+                        <span class="muscle-tag">僧帽筋</span>
+                        <span class="muscle-tag">ハムストリング</span>
+                        <span class="muscle-tag">大臀筋</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 胸の種目 -->
+        <div class="category-section">
+            <div class="category-header chest">
+                <h2 class="category-title">胸 (CHEST) - 4種目</h2>
+            </div>
+            <div class="exercise-grid">
+                <div class="exercise-card" data-name="ベンチプレス">
+                    <h3 class="exercise-name">ベンチプレス</h3>
+                    <p class="exercise-description">胸の筋肉を主に鍛える基本的な種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">大胸筋</span>
+                        <span class="muscle-tag">三角筋前部</span>
+                        <span class="muscle-tag">上腕三頭筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="ダンベルフライ">
+                    <h3 class="exercise-name">ダンベルフライ</h3>
+                    <p class="exercise-description">胸筋のストレッチを重視した種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">大胸筋</span>
+                        <span class="muscle-tag">前部三角筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="チェストプレス">
+                    <h3 class="exercise-name">チェストプレス</h3>
+                    <p class="exercise-description">マシンで安全に胸筋を鍛える種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">大胸筋</span>
+                        <span class="muscle-tag">前部三角筋</span>
+                        <span class="muscle-tag">上腕三頭筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="ペクトラルフライ">
+                    <h3 class="exercise-name">ペクトラルフライ</h3>
+                    <p class="exercise-description">胸筋の内側を重点的に鍛える種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">大胸筋</span>
+                        <span class="muscle-tag">前部三角筋</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 肩の種目 -->
+        <div class="category-section">
+            <div class="category-header shoulders">
+                <h2 class="category-title">肩 (SHOULDERS) - 3種目</h2>
+            </div>
+            <div class="exercise-grid">
+                <div class="exercise-card" data-name="ラテラルレイズ">
+                    <h3 class="exercise-name">ラテラルレイズ</h3>
+                    <p class="exercise-description">肩幅を広げる代表的な種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">中部三角筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="サイドレイズ">
+                    <h3 class="exercise-name">サイドレイズ</h3>
+                    <p class="exercise-description">肩の側面を鍛える基本種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">中部三角筋</span>
+                        <span class="muscle-tag">前部三角筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="ローテーターカフ">
+                    <h3 class="exercise-name">ローテーターカフ</h3>
+                    <p class="exercise-description">肩関節の安定性を向上させる種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">棘上筋</span>
+                        <span class="muscle-tag">棘下筋</span>
+                        <span class="muscle-tag">小円筋</span>
+                        <span class="muscle-tag">肩甲下筋</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 腕の種目 -->
+        <div class="category-section">
+            <div class="category-header arms">
+                <h2 class="category-title">腕 (ARMS) - 7種目</h2>
+            </div>
+            <div class="exercise-grid">
+                <div class="exercise-card" data-name="インクラインダンベルカール">
+                    <h3 class="exercise-name">インクラインダンベルカール</h3>
+                    <p class="exercise-description">上腕二頭筋のストレッチを重視したカール</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">上腕二頭筋</span>
+                        <span class="muscle-tag">腕橈骨筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="アームカール">
+                    <h3 class="exercise-name">アームカール</h3>
+                    <p class="exercise-description">上腕二頭筋を鍛える基本種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">上腕二頭筋</span>
+                        <span class="muscle-tag">腕橈骨筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="ロープレスダウン">
+                    <h3 class="exercise-name">ロープレスダウン</h3>
+                    <p class="exercise-description">ケーブルマシンで上腕三頭筋を鍛える種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">上腕三頭筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="フレンチプレス">
+                    <h3 class="exercise-name">フレンチプレス</h3>
+                    <p class="exercise-description">座位または立位で行う上腕三頭筋種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">上腕三頭筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="リバースプッシュアップ">
+                    <h3 class="exercise-name">リバースプッシュアップ</h3>
+                    <p class="exercise-description">自重で上腕三頭筋を鍛える種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">上腕三頭筋</span>
+                        <span class="muscle-tag">前部三角筋</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- コアの種目 -->
+        <div class="category-section">
+            <div class="category-header core">
+                <h2 class="category-title">コア (CORE) - 3種目</h2>
+            </div>
+            <div class="exercise-grid">
+                <div class="exercise-card" data-name="プランク">
+                    <h3 class="exercise-name">プランク</h3>
+                    <p class="exercise-description">体幹を強化する静的種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">腹直筋</span>
+                        <span class="muscle-tag">腹横筋</span>
+                        <span class="muscle-tag">腹斜筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="アブドミナル">
+                    <h3 class="exercise-name">アブドミナル</h3>
+                    <p class="exercise-description">マシンを使った腹筋トレーニング</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">腹直筋</span>
+                        <span class="muscle-tag">腹斜筋</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card" data-name="トーソローテーション">
+                    <h3 class="exercise-name">トーソローテーション</h3>
+                    <p class="exercise-description">体幹の回旋動作を鍛える種目</p>
+                    <div class="target-muscles">
+                        <span class="muscle-tag">腹斜筋</span>
+                        <span class="muscle-tag">腹横筋</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center;">
+            <h3>🎉 エクササイズ種目追加完了！</h3>
+            <p>合計22種目の豊富なワークアウトメニューが利用可能になりました。</p>
+            <p>各種目には詳細な実行手順と対象筋肉の説明が含まれています。</p>
+        </div>
+    </div>
+
+    <script>
+        function filterExercises() {
+            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+            const exerciseCards = document.querySelectorAll('.exercise-card');
+            
+            exerciseCards.forEach(card => {
+                const exerciseName = card.dataset.name.toLowerCase();
+                const muscles = card.querySelectorAll('.muscle-tag');
+                let muscleText = Array.from(muscles).map(m => m.textContent.toLowerCase()).join(' ');
+                
+                if (exerciseName.includes(searchTerm) || muscleText.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

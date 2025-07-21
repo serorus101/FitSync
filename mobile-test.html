@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitSync - iPhoneサイズ確認</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .device-frame {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #000;
+            border-radius: 0 0 15px 15px;
+            z-index: 10;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .app-content {
+            height: calc(100% - 44px - 83px);
+            overflow-y: auto;
+        }
+        
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 83px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+        
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8E8E93;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        .tab-item.active {
+            color: #007AFF;
+        }
+        
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+            background: currentColor;
+            border-radius: 4px;
+        }
+        
+        .header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #E5E5EA;
+        }
+        
+        .header h1 {
+            margin: 0 0 4px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #212529;
+        }
+        
+        .header p {
+            margin: 0;
+            font-size: 16px;
+            color: #6C757D;
+        }
+        
+        .exercise-list {
+            padding: 16px;
+        }
+        
+        .search-bar {
+            margin-bottom: 16px;
+            padding: 12px;
+            border: 1px solid #E5E5EA;
+            border-radius: 10px;
+            font-size: 16px;
+            background: #F8F9FA;
+        }
+        
+        .exercise-item {
+            background: #F8F9FA;
+            border: 1px solid #E9ECEF;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .exercise-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .exercise-muscles {
+            font-size: 14px;
+            color: #6C757D;
+        }
+        
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: #000;
+            border-radius: 2.5px;
+        }
+        
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        
+        .device-selector {
+            margin-bottom: 10px;
+        }
+        
+        .device-selector button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            background: #007AFF;
+            color: white;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .device-selector button:hover {
+            background: #0056CC;
+        }
+        
+        .calendar-view {
+            display: none;
+            padding: 16px;
+        }
+        
+        .calendar-header {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #212529;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .calendar-day.header {
+            color: #6C757D;
+            font-weight: 600;
+        }
+        
+        .calendar-day.workout {
+            background: #28A745;
+            color: white;
+        }
+        
+        .calendar-day.today {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .workout-detail {
+            background: #F8F9FA;
+            border-radius: 10px;
+            padding: 16px;
+        }
+        
+        .workout-detail h3 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .workout-item {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-left: 4px solid #007AFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <div>iPhone サイズ確認</div>
+        <div class="device-selector">
+            <button onclick="setDevice('iphone14', 375, 812)">iPhone 14</button>
+            <button onclick="setDevice('iphone14pro', 393, 852)">iPhone 14 Pro</button>
+            <button onclick="setDevice('iphone14promax', 428, 926)">iPhone 14 Pro Max</button>
+        </div>
+        <div id="current-device">iPhone 14 (375×812)</div>
+        <div>タップで画面切り替え</div>
+    </div>
+
+    <div class="device-frame" id="device-frame">
+        <div class="screen">
+            <div class="notch"></div>
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>🔋 100%</span>
+            </div>
+            
+            <div class="app-content">
+                <!-- ワークアウト画面 -->
+                <div id="workout-screen" class="screen-content">
+                    <div class="header">
+                        <h1>FitSync</h1>
+                        <p>ワークアウト記録</p>
+                    </div>
+                    
+                    <div class="exercise-list">
+                        <input type="text" class="search-bar" placeholder="エクササイズを検索" />
+                        
+                        <div class="exercise-item" onclick="showExerciseDetail('ベンチプレス')">
+                            <div class="exercise-name">ベンチプレス</div>
+                            <div class="exercise-muscles">大胸筋, 三角筋前部, 上腕三頭筋</div>
+                        </div>
+                        
+                        <div class="exercise-item" onclick="showExerciseDetail('スクワット')">
+                            <div class="exercise-name">スクワット</div>
+                            <div class="exercise-muscles">大腿四頭筋, 大臀筋, ハムストリング</div>
+                        </div>
+                        
+                        <div class="exercise-item" onclick="showExerciseDetail('デッドリフト')">
+                            <div class="exercise-name">デッドリフト</div>
+                            <div class="exercise-muscles">広背筋, 僧帽筋, ハムストリング, 大臀筋</div>
+                        </div>
+                        
+                        <div class="exercise-item" onclick="showExerciseDetail('プランク')">
+                            <div class="exercise-name">プランク</div>
+                            <div class="exercise-muscles">腹直筋, 腹横筋, 腹斜筋</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- カレンダー画面 -->
+                <div id="calendar-screen" class="screen-content calendar-view">
+                    <div class="calendar-header">2025年1月</div>
+                    
+                    <div class="calendar-grid">
+                        <div class="calendar-day header">日</div>
+                        <div class="calendar-day header">月</div>
+                        <div class="calendar-day header">火</div>
+                        <div class="calendar-day header">水</div>
+                        <div class="calendar-day header">木</div>
+                        <div class="calendar-day header">金</div>
+                        <div class="calendar-day header">土</div>
+                        
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day">1</div>
+                        <div class="calendar-day">2</div>
+                        <div class="calendar-day">3</div>
+                        <div class="calendar-day">4</div>
+                        <div class="calendar-day">5</div>
+                        <div class="calendar-day">6</div>
+                        <div class="calendar-day">7</div>
+                        <div class="calendar-day">8</div>
+                        <div class="calendar-day">9</div>
+                        <div class="calendar-day">10</div>
+                        <div class="calendar-day">11</div>
+                        <div class="calendar-day">12</div>
+                        <div class="calendar-day">13</div>
+                        <div class="calendar-day">14</div>
+                        <div class="calendar-day">15</div>
+                        <div class="calendar-day">16</div>
+                        <div class="calendar-day">17</div>
+                        <div class="calendar-day">18</div>
+                        <div class="calendar-day workout">19</div>
+                        <div class="calendar-day workout">20</div>
+                        <div class="calendar-day today">21</div>
+                        <div class="calendar-day">22</div>
+                        <div class="calendar-day">23</div>
+                        <div class="calendar-day">24</div>
+                        <div class="calendar-day">25</div>
+                        <div class="calendar-day">26</div>
+                        <div class="calendar-day">27</div>
+                        <div class="calendar-day">28</div>
+                        <div class="calendar-day">29</div>
+                        <div class="calendar-day">30</div>
+                        <div class="calendar-day">31</div>
+                    </div>
+                    
+                    <div class="workout-detail">
+                        <h3>1月20日のワークアウト</h3>
+                        <div class="workout-item">
+                            <div style="font-weight: 600; margin-bottom: 4px;">ベンチプレス</div>
+                            <div style="font-size: 14px; color: #6C757D;">60kg × 10回, 65kg × 8回, 70kg × 6回</div>
+                        </div>
+                        <div class="workout-item">
+                            <div style="font-weight: 600; margin-bottom: 4px;">スクワット</div>
+                            <div style="font-size: 14px; color: #6C757D;">80kg × 12回, 85kg × 10回, 90kg × 8回</div>
+                        </div>
+                        <div style="margin-top: 12px; font-size: 14px; color: #6C757D;">
+                            総時間: 27分
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-bar">
+                <div class="tab-item active" onclick="switchTab('workout')">
+                    <div class="tab-icon"></div>
+                    <span>ワークアウト</span>
+                </div>
+                <div class="tab-item" onclick="switchTab('calendar')">
+                    <div class="tab-icon"></div>
+                    <span>カレンダー</span>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon"></div>
+                    <span>その他</span>
+                </div>
+            </div>
+            
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+
+    <script>
+        function setDevice(name, width, height) {
+            const frame = document.getElementById('device-frame');
+            frame.style.width = width + 'px';
+            frame.style.height = height + 'px';
+            
+            document.getElementById('current-device').textContent = 
+                `${name.replace('iphone', 'iPhone ').replace('14', ' 14').replace('pro', ' Pro').replace('max', ' Max')} (${width}×${height})`;
+        }
+        
+        function switchTab(tab) {
+            // タブの見た目を更新
+            const tabs = document.querySelectorAll('.tab-item');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // 画面を切り替え
+            const screens = document.querySelectorAll('.screen-content');
+            screens.forEach(s => s.style.display = 'none');
+            
+            if (tab === 'workout') {
+                document.getElementById('workout-screen').style.display = 'block';
+            } else if (tab === 'calendar') {
+                document.getElementById('calendar-screen').style.display = 'block';
+            }
+        }
+        
+        function showExerciseDetail(exerciseName) {
+            alert(`${exerciseName} の詳細説明\n\n実際のアプリでは長押しでモーダルが表示され、\n動作説明、対象筋肉、実行手順が表示されます。`);
+        }
+        
+        // 長押しシミュレーション
+        let longPressTimer;
+        document.querySelectorAll('.exercise-item').forEach(item => {
+            item.addEventListener('touchstart', function(e) {
+                longPressTimer = setTimeout(() => {
+                    const name = this.querySelector('.exercise-name').textContent;
+                    showExerciseDetail(name);
+                }, 800);
+            });
+            
+            item.addEventListener('touchend', function() {
+                clearTimeout(longPressTimer);
+            });
+        });
+        
+        // 初期状態でワークアウト画面を表示
+        switchTab('workout');
+    </script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "FitSync",
-    "slug": "FitSync",
+    "slug": "fitsync",
+    "owner": "araken101",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,7 +10,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.fitsync.app",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +27,17 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "FitSync - フィットネストラッカー",
+      "shortName": "FitSync",
+      "description": "22種目の詳細なワークアウトガイド付きフィットネスアプリ",
+      "themeColor": "#007AFF",
+      "backgroundColor": "#ffffff",
+      "display": "standalone",
+      "orientation": "portrait",
+      "startUrl": "/",
+      "scope": "/",
+      "lang": "ja"
     },
     "plugins": [
       "expo-router",
@@ -37,6 +53,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a19242fb-95d9-4954-b917-dea60d5b1915"
+      }
     }
   }
 }
